@@ -1,0 +1,40 @@
+# Environment variables
+.env
+.env.*
+
+# Keep example env file
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local data
+data/raw/
+data/processed/
+
+# Docker / local volumes
+postgres_data/
+pgadmin_data/
+
+# Temporary files
+*.tmp
+*.swp
