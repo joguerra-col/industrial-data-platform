@@ -8,31 +8,64 @@ The project will evolve progressively from raw industrial data generation to ing
 
 ### Phase 01 — Quarry & Limestone Crushing
 
-The first phase models the limestone extraction process:
+From the quarry bench to the crushed-limestone stockpile:
 
-- Quarry extraction
 - Drilling and blasting
-- Heavy equipment operation
-- Loading and haulage
-- Fuel and consumables
-- Weighing
-- Material quality
-- Limestone crushing
-- Inventory management
+- Loading and haulage (excavators, loaders, haul trucks with on-board payload sensors)
+- Primary crushing (hopper, crusher, belt scale)
+- Online quality measurement (cross-belt analyzer, laboratory validation)
+- Equipment maintenance
 
-## Initial Architecture
+A Python simulator acts as the plant. It produces the data each source system would deliver:
+
+| Source system | Delivers | Format |
+|---|---|---|
+| Planning spreadsheet | Drilling & blasting | Excel file (weekly) |
+| Fleet management system (FMS) | Equipment telemetry & sensor events | REST API |
+| Maintenance system (CMMS) | Assets, work orders, spare parts | PostgreSQL database |
+| Laboratory (LIMS) | Analyzer validation samples | CSV/JSON (daily, late-arriving) |
+| Plant historian (SCADA) | Crusher, belt scale and analyzer readings | CSV (every minute) |
+
+Full data requirements: [`docs/phase-01-quarry/data-requirements.md`](docs/phase-01-quarry/data-requirements.md).
+
+> **Fictitious operation.** The quarry, its location, equipment and all generated data are simulated. The site coordinates (Tolima, Colombia) were chosen only so geofences appear on real terrain in a map. They do not represent, and are not based on, any real company or operation.
+
+## Architecture
 
 ```text
-Industrial Process
+Simulated source systems (files, REST API, database)
         ↓
-Python Simulator
-        ↓
-Raw Data
+Bronze — raw data, as delivered
         ↓
 PostgreSQL
         ↓
-Staging
+Silver — cleaned and conformed (staging)
         ↓
-Core Data Model
+Gold — dimensional model and KPIs (core)
         ↓
 Analytics
+```
+
+## Quick Start
+
+Requires Docker with Docker Compose.
+
+```bash
+cp .env.example .env     # then set your own passwords
+docker compose up -d
+```
+
+| Service | URL |
+|---|---|
+| PostgreSQL | `localhost:5432` |
+| pgAdmin | http://localhost:5050 |
+| Jupyter | http://localhost:8888 |
+
+In pgAdmin, register the server with host `postgres` and port `5432`. Containers reach each other by service name on the Compose network, so use `postgres`, not `localhost`.
+
+## Status
+
+- [x] Local PostgreSQL + pgAdmin environment with persistent storage
+- [ ] Quarry simulator (in progress)
+- [ ] Ingestion into PostgreSQL
+- [ ] Silver and Gold models
