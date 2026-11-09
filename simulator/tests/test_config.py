@@ -70,6 +70,11 @@ class ConfigTest(unittest.TestCase):
         dup = '\n[[zones]]\nzone_id = "ZN-QUE-01"\nzone_type = "queue"\npolygon_wkt = "POLYGON((0 0))"\n'
         self.assert_rejected(self.text + dup, "zone ID ZN-QUE-01 is used more than once")
 
+    def test_meal_window_inside_handover_rejected(self):
+        self.assert_rejected(self.text.replace('meal_window_start = "12:00"',
+                                               'meal_window_start = "08:05"'),
+                             "outside handovers")
+
     def test_all_errors_reported_together(self):
         text = self.text.replace('"1-91-TRK-03"', '"1-91-TRK-3"').replace(
             'status = "planned"', 'status = "closed"')

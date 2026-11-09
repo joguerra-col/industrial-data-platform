@@ -3,10 +3,12 @@
 import argparse
 import logging
 import os
+import random
 import sys
 from datetime import date
 from pathlib import Path
 
+from quarry_sim.calendar import build_calendar
 from quarry_sim.config import ConfigError, load_config
 from quarry_sim.writers import write_reference
 
@@ -72,7 +74,16 @@ def main(argv: list[str] | None = None) -> int:
     except OSError as exc:
         log.error("Could not write output: %s", exc)
         return 1
-    # Next: build shift calendar (1.3), then simulate.
+
+    # One random stream per component, so changing one component never shifts another's output.
+    shifts = build_calendar(config, args.start_date, args.days,
+                            random.Random(f"{args.seed}:calendar"))
+    if not shifts:
+        log.warning("No scheduled shifts in the requested dates: nothing to simulate")
+    else:
+        log.info("Calendar: %d shifts, %s to %s", len(shifts), shifts[0].shift_id,
+                 shifts[-1].shift_id)
+    # Next: simulate haulage (S2) over these shifts.
     log.info("Done")
     return 0
 

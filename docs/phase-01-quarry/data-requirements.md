@@ -3,6 +3,8 @@
 > **Status:** draft for review.
 > **Scope:** from the quarry bench to the crushed-limestone stockpile (and the waste dump for overburden).
 > **Principle:** this document defines **raw (Bronze) data only**, exactly as each source system would deliver it. Metrics such as mine productivity, powder factor, availability or average t/h are **not generated**; they are calculated later in Silver/Gold from these fields.
+>
+> **Implementation scope:** this is the full target design. The simulator exists to feed the data platform, so it is built in vertical slices: each source is added end to end (simulation → ingestion → staging → model), starting with FMS haul events. Realism details that add no data engineering value (5-min telemetry, blasting spreadsheet, lab re-analyses, full CMMS, queues, sensor drifts) are in the backlog until the core pipeline is complete.
 
 ---
 

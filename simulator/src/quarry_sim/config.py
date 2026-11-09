@@ -280,6 +280,9 @@ def _validate_calendar(cal: Calendar, errors: list[str]) -> None:
     _positive(cal.meal_break_min, "calendar.meal_break_min", errors)
     if not cal.shifts:
         errors.append("calendar: at least one shift is required")
+    # Bad values were reported above; use 0 so the shift checks below don't crash on them.
+    handover = cal.handover_min if isinstance(cal.handover_min, int) else 0
+    meal_break = cal.meal_break_min if isinstance(cal.meal_break_min, int) else 0
     for s in cal.shifts:
         where = f"shift {s.name}"
         times = (s.start, s.end, s.meal_window_start, s.meal_window_end)
@@ -289,5 +292,7 @@ def _validate_calendar(cal: Calendar, errors: list[str]) -> None:
         start, end, meal_start, meal_end = map(hhmm_minutes, times)
         if not start < end:
             errors.append(f"{where}: start must be before end")
-        if not start <= meal_start < meal_end <= end:
-            errors.append(f"{where}: meal window must fall inside the shift")
+        if not start + handover <= meal_start < meal_end <= end - handover:
+            errors.append(f"{where}: meal window must fall inside the shift, outside handovers")
+        if meal_end - meal_start < meal_break:
+            errors.append(f"{where}: meal window is shorter than one meal break")
