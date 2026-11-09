@@ -184,6 +184,34 @@ available_tonnage_t = 2000000
 initial_broken_stock_t = 0
 status = "planned"
 
+# Haulage (section 3.2, simplified for issue #2): each loading unit works one bench, trucks pick a
+# loading unit by dispatch_weight. No queues. Distances are haul-road lengths, the same for every bench.
+[haulage]
+distance_to_hopper_km = 2.4
+distance_to_dump_km = 1.2
+loaded_speed_kmh = 22
+empty_speed_kmh = 30
+bucket_pass_s = 35
+dump_s = 60
+fuel_l_per_h_per_t_loaded = 1.2   # x truck nominal payload: a 55 t truck burns ~66 L/h loaded
+fuel_l_per_h_per_t_empty = 0.7
+fuel_l_per_h_per_t_idle = 0.25
+
+[[haulage.loading]]
+loading_unit_id = "1-11-EXC-01"
+bench_id = "1-11-BNK-01"
+dispatch_weight = 0.45
+
+[[haulage.loading]]
+loading_unit_id = "1-11-EXC-02"
+bench_id = "1-11-BNK-03"
+dispatch_weight = 0.35
+
+[[haulage.loading]]
+loading_unit_id = "1-11-LDR-01"
+bench_id = "1-11-BNK-04"
+dispatch_weight = 0.20
+
 # Zones (geofences, section 3.2 /zones). FICTITIOUS site centred on 4.1615 N, -75.1840 (Tolima,
 # Colombia), chosen only so the polygons sit on real terrain in a map. The operation and all data
 # are simulated and do not represent any real company. Bench elevations follow the SRTM terrain

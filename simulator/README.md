@@ -29,6 +29,17 @@ SIM_OUTPUT_DIR=./output docker compose run --rm simulator --start-date 2026-11-0
 | `--seed` | 42 | Same seed + same dates = identical output |
 | `--output` | `$QUARRY_SIM_OUTPUT` or `./output` | Output directory |
 
+## Output
+
+```text
+<output>/
+├── reference/            master data: equipment.csv, benches.csv, zones.csv
+└── fms/events/           FMS sensor events, one JSON Lines file per UTC day of event_ts
+    └── YYYY-MM-DD.jsonl
+```
+
+Same seed and dates produce byte-identical files, so re-running a date range overwrites it with the same content.
+
 ## Test
 
 ```bash

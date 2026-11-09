@@ -10,7 +10,8 @@ from pathlib import Path
 
 from quarry_sim.calendar import build_calendar
 from quarry_sim.config import ConfigError, load_config
-from quarry_sim.writers import write_reference
+from quarry_sim.haulage import simulate_haulage
+from quarry_sim.writers import write_fms_events, write_reference
 
 log = logging.getLogger("quarry_sim")
 
@@ -80,10 +81,24 @@ def main(argv: list[str] | None = None) -> int:
                             random.Random(f"{args.seed}:calendar"))
     if not shifts:
         log.warning("No scheduled shifts in the requested dates: nothing to simulate")
-    else:
-        log.info("Calendar: %d shifts, %s to %s", len(shifts), shifts[0].shift_id,
-                 shifts[-1].shift_id)
-    # Next: simulate haulage (S2) over these shifts.
+        log.info("Done")
+        return 0
+    log.info("Calendar: %d shifts, %s to %s", len(shifts), shifts[0].shift_id,
+             shifts[-1].shift_id)
+
+    haulage = simulate_haulage(config, shifts, args.start_date,
+                               random.Random(f"{args.seed}:haulage"))
+    tonnes = {}
+    for trip in haulage.trips:
+        tonnes[trip.material_type] = tonnes.get(trip.material_type, 0) + trip.payload_t
+    log.info("Haulage: %d trips, %d events, tonnes %s", len(haulage.trips), len(haulage.events),
+             {m: round(t) for m, t in sorted(tonnes.items())})
+    try:
+        paths = write_fms_events(haulage.events, args.output)
+    except OSError as exc:
+        log.error("Could not write output: %s", exc)
+        return 1
+    log.info("Wrote %d FMS event files to %s", len(paths), args.output / "fms" / "events")
     log.info("Done")
     return 0
 

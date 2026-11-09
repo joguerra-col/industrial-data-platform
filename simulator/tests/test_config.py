@@ -75,6 +75,16 @@ class ConfigTest(unittest.TestCase):
                                                'meal_window_start = "08:05"'),
                              "outside handovers")
 
+    def test_loading_unit_must_be_excavator_or_loader(self):
+        self.assert_rejected(self.text.replace('loading_unit_id = "1-11-LDR-01"',
+                                               'loading_unit_id = "1-91-TRK-01"'),
+                             "must be an excavator or loader")
+
+    def test_loading_bench_must_be_active(self):
+        self.assert_rejected(self.text.replace('bench_id = "1-11-BNK-03"\ndispatch_weight',
+                                               'bench_id = "1-11-BNK-05"\ndispatch_weight'),
+                             "must exist and be active")
+
     def test_all_errors_reported_together(self):
         text = self.text.replace('"1-91-TRK-03"', '"1-91-TRK-3"').replace(
             'status = "planned"', 'status = "closed"')

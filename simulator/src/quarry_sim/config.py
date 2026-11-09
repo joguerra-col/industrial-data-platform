@@ -2,7 +2,7 @@
 
 import re
 import tomllib
-from dataclasses import MISSING, dataclass, fields
+from dataclasses import MISSING, dataclass, fields, replace
 from datetime import date
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -106,12 +106,34 @@ class Zone:
 
 
 @dataclass(frozen=True)
+class LoadingAssignment:
+    loading_unit_id: str
+    bench_id: str
+    dispatch_weight: float
+
+
+@dataclass(frozen=True)
+class Haulage:
+    distance_to_hopper_km: float
+    distance_to_dump_km: float
+    loaded_speed_kmh: float
+    empty_speed_kmh: float
+    bucket_pass_s: float
+    dump_s: float
+    fuel_l_per_h_per_t_loaded: float
+    fuel_l_per_h_per_t_empty: float
+    fuel_l_per_h_per_t_idle: float
+    loading: tuple[LoadingAssignment, ...]
+
+
+@dataclass(frozen=True)
 class PlantConfig:
     plant: Plant
     calendar: Calendar
     equipment: tuple[Equipment, ...]
     benches: tuple[Bench, ...]
     zones: tuple[Zone, ...]
+    haulage: Haulage
 
 
 def hhmm_minutes(value: str) -> int:
@@ -139,6 +161,10 @@ def load_config(path: Path) -> PlantConfig:
     benches = [_build(Bench, t, f"benches[{i}]", errors)
                for i, t in enumerate(raw.get("benches", []))]
     zones = [_build(Zone, t, f"zones[{i}]", errors) for i, t in enumerate(raw.get("zones", []))]
+    haul_raw = raw.get("haulage") or {}
+    loading = [_build(LoadingAssignment, t, f"haulage.loading[{i}]", errors)
+               for i, t in enumerate(haul_raw.get("loading", []))]
+    haulage = _build(Haulage, {**haul_raw, "loading": ()}, "haulage", errors)
     if errors:  # structural problems: validating values would only add noise
         raise ConfigError(errors)
 
@@ -149,6 +175,7 @@ def load_config(path: Path) -> PlantConfig:
         equipment=tuple(equipment),
         benches=tuple(benches),
         zones=tuple(zones),
+        haulage=replace(haulage, loading=tuple(loading)),
     )
     _validate(config, errors)
     if errors:
@@ -271,6 +298,40 @@ def _validate(cfg: PlantConfig, errors: list[str]) -> None:
     zone_ids = [z.zone_id for z in cfg.zones]
     for dup in sorted({i for i in zone_ids if zone_ids.count(i) > 1}):
         errors.append(f"zone ID {dup} is used more than once")
+
+    _validate_haulage(cfg, errors)
+
+
+def _validate_haulage(cfg: PlantConfig, errors: list[str]) -> None:
+    h = cfg.haulage
+    for f in fields(Haulage):
+        if f.name != "loading":
+            _positive(getattr(h, f.name), f"haulage.{f.name}", errors)
+    units = {e.equipment_id: e for e in cfg.equipment}
+    benches = {b.bench_id: b for b in cfg.benches}
+    zone_ids = {z.zone_id for z in cfg.zones}
+    for zone in (cfg.plant.hopper_id, cfg.plant.waste_dump_id):
+        if zone not in zone_ids:
+            errors.append(f"zones: haulage needs a zone for {zone}")
+    if not h.loading:
+        errors.append("haulage: at least one [[haulage.loading]] assignment is required")
+    for a in h.loading:
+        where = f"haulage.loading {a.loading_unit_id}"
+        unit = units.get(a.loading_unit_id)
+        if unit is None or unit.equipment_type not in ("excavator", "loader"):
+            errors.append(f"{where}: must be an excavator or loader in [[equipment]]")
+        bench = benches.get(a.bench_id)
+        if bench is None or bench.status != "active":
+            errors.append(f"{where}: bench {a.bench_id} must exist and be active")
+        if a.bench_id not in zone_ids:
+            errors.append(f"{where}: bench {a.bench_id} has no load zone")
+        _positive(a.dispatch_weight, f"{where}.dispatch_weight", errors)
+    assigned = [a.loading_unit_id for a in h.loading]
+    for dup in sorted({u for u in assigned if assigned.count(u) > 1}):
+        errors.append(f"haulage.loading: {dup} is assigned more than once")
+    if not any(benches.get(a.bench_id) and benches[a.bench_id].material_type in ("HG", "MG")
+               for a in h.loading):
+        errors.append("haulage.loading: at least one HG or MG bench must be worked")
 
 
 def _validate_calendar(cal: Calendar, errors: list[str]) -> None:
