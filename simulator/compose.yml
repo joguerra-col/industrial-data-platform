@@ -1,0 +1,9 @@
+# The simulated plant. Independent from the data platform's docker-compose.yml.
+# Paths are relative to this folder.
+services:
+  simulator:
+    build: .
+    user: "${UID:-1000}:${GID:-1000}"   # generated files belong to you, not root
+    volumes:
+      # Default: the platform's Bronze folder in this repo. On another machine set SIM_OUTPUT_DIR.
+      - ${SIM_OUTPUT_DIR:-../data/raw}:/data

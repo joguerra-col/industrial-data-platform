@@ -289,7 +289,7 @@ Periodic readings follow the ISO 15143-3 / AEMP 2.0 telematics standard (cumulat
 | `zone_enter` / `zone_exit` | All | GPS + geofences |
 | `payload_step` | Haul truck | Suspension pressure (each bucket pass raises the weight) |
 | `bucket_dump` | Excavator / loader | Hydraulic bucket weighing |
-| `body_up` / `body_down` | Haul truck | Body sensor. `body_down` carries the residual weight left in the body (carryback) |
+| `body_up` / `body_down` | Haul truck | Body sensor. `body_down` carries the residual weight left in the body (carryback): normally 0–0.3 t |
 | `operator_login` / `operator_logout` | All | Cab terminal (also marks handovers and meal breaks) |
 | `engine_start` / `engine_stop` | All | Engine control unit |
 
@@ -644,7 +644,7 @@ Injected at a configurable rate (default 1–2 %):
 - Incomplete sequences: missing `body_down` or `zone_exit`
 - `payload_step` with weight dropping during loading (sensor noise)
 - **Payload sensor bias:** one truck reads consistently 6–10 % high or low until its sensor is recalibrated
-- **Carryback:** material left in the body after dumping (`body_down` with residual weight above 0)
+- **Heavy carryback:** sticky material left in the body after dumping (`body_down` residual of 1–3 t, well above the normal 0–0.3 t)
 - **Belt-scale zero drift:** a gradual offset that resets at the next `zero` calibration
 - Analyzer drift: a gradual bias against the lab that resets when `calibration_version` changes
 - Lab CaO out of range
