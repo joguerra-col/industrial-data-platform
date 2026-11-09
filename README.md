@@ -28,6 +28,8 @@ A Python simulator acts as the plant. It produces the data each source system wo
 
 Full data requirements: [`docs/phase-01-quarry/data-requirements.md`](docs/phase-01-quarry/data-requirements.md).
 
+> **Fictitious operation.** The quarry, its location, equipment and all generated data are simulated. The site coordinates (Tolima, Colombia) were chosen only so geofences appear on real terrain in a map. They do not represent, and are not based on, any real company or operation.
+
 ## Architecture
 
 ```text

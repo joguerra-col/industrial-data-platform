@@ -7,6 +7,9 @@ import sys
 from datetime import date
 from pathlib import Path
 
+from quarry_sim.config import ConfigError, load_config
+from quarry_sim.writers import write_reference
+
 log = logging.getLogger("quarry_sim")
 
 
@@ -31,6 +34,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--output", type=Path,
                         default=Path(os.environ.get("QUARRY_SIM_OUTPUT", "output")),
                         help="output directory (default: $QUARRY_SIM_OUTPUT or ./output)")
+    parser.add_argument("--config", type=Path, default=Path("config/plant.toml"),
+                        help="plant configuration file (default: config/plant.toml)")
     return parser.parse_args(argv)
 
 
@@ -50,9 +55,24 @@ def main(argv: list[str] | None = None) -> int:
         log.error("Output directory %s is not writable: %s", args.output, exc)
         return 1
 
+    try:
+        config = load_config(args.config)
+    except ConfigError as exc:
+        log.error("Invalid configuration %s:", args.config)
+        for error in exc.errors:
+            log.error("  - %s", error)
+        return 1
+    log.info("Loaded %s: %d equipment, %d benches, %d zones", args.config,
+             len(config.equipment), len(config.benches), len(config.zones))
+
     log.info("Simulating %d day(s) from %s with seed %d into %s",
              args.days, args.start_date, args.seed, args.output.resolve())
-    # Next activities plug in here: load config (1.2), build shift calendar (1.3), simulate.
+    try:
+        write_reference(config, args.output)
+    except OSError as exc:
+        log.error("Could not write output: %s", exc)
+        return 1
+    # Next: build shift calendar (1.3), then simulate.
     log.info("Done")
     return 0
 

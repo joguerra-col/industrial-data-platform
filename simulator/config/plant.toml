@@ -1,0 +1,241 @@
+# Plant master data. Source: docs/phase-01-quarry/data-requirements.md, section 2.
+# Asset IDs follow A-GL-TTT-NN (section 2.1).
+
+[plant]
+timezone = "America/Bogota"
+hopper_id = "2-11-HOP-01"
+crusher_id = "2-11-CRS-01"
+belt_scale_id = "2-11-BWS-01"
+analyzer_id = "2-11-ANZ-01"
+stockpile_id = "2-91-STK-01"
+waste_dump_id = "1-81-DMP-01"
+hopper_live_capacity_t = 150
+crusher_nominal_tph = 1000
+crusher_to_scale_delay_s = 60
+scale_to_analyzer_delay_s = 20
+
+# Shift calendar (section 2.4). Times are local (timezone above). Weekdays: 0 = Monday.
+[calendar]
+operating_weekdays = [0, 1, 2, 3, 4, 5]
+handover_min = 10
+meal_break_min = 30
+
+[[calendar.shifts]]
+name = "A"
+start = "08:00"
+end = "16:00"
+meal_window_start = "12:00"
+meal_window_end = "14:00"
+
+[[calendar.shifts]]
+name = "B"
+start = "16:00"
+end = "24:00"
+meal_window_start = "19:00"
+meal_window_end = "21:00"
+
+# Fleet (section 2.2), one block per unit.
+
+[[equipment]]
+equipment_id = "1-11-DRL-01"
+equipment_type = "drill"
+model_class = "Crawler drill rig"
+fuel_tank_l = 600
+commissioned_date = 2020-02-10
+
+[[equipment]]
+equipment_id = "1-11-EXC-01"
+equipment_type = "excavator"
+model_class = "Hydraulic excavator 70 t"
+bucket_capacity_t = 11
+fuel_tank_l = 900
+commissioned_date = 2019-06-01
+
+[[equipment]]
+equipment_id = "1-11-EXC-02"
+equipment_type = "excavator"
+model_class = "Hydraulic excavator 70 t"
+bucket_capacity_t = 11
+fuel_tank_l = 900
+commissioned_date = 2022-01-20
+
+[[equipment]]
+equipment_id = "1-11-LDR-01"
+equipment_type = "loader"
+model_class = "Wheel loader 50 t"
+bucket_capacity_t = 8
+fuel_tank_l = 500
+commissioned_date = 2021-08-05
+
+[[equipment]]
+equipment_id = "1-91-TRK-01"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 55 t"
+nominal_payload_t = 55
+fuel_tank_l = 700
+commissioned_date = 2019-07-15
+
+[[equipment]]
+equipment_id = "1-91-TRK-02"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 55 t"
+nominal_payload_t = 55
+fuel_tank_l = 700
+commissioned_date = 2019-07-15
+
+[[equipment]]
+equipment_id = "1-91-TRK-03"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 55 t"
+nominal_payload_t = 55
+fuel_tank_l = 700
+commissioned_date = 2020-11-02
+
+[[equipment]]
+equipment_id = "1-91-TRK-04"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 55 t"
+nominal_payload_t = 55
+fuel_tank_l = 700
+commissioned_date = 2022-03-28
+
+[[equipment]]
+equipment_id = "1-91-TRK-05"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 55 t"
+nominal_payload_t = 55
+fuel_tank_l = 700
+commissioned_date = 2023-09-11
+
+[[equipment]]
+equipment_id = "1-91-TRK-06"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 35 t"
+nominal_payload_t = 35
+fuel_tank_l = 500
+commissioned_date = 2018-04-23
+
+[[equipment]]
+equipment_id = "1-91-TRK-07"
+equipment_type = "haul_truck"
+model_class = "Rigid haul truck 35 t"
+nominal_payload_t = 35
+fuel_tank_l = 500
+commissioned_date = 2018-04-23
+
+# Benches (section 2.3). Chemistry within the section 3.7 ranges; WASTE has none.
+# shortcut: initial_broken_stock_t is sized so a few weeks can be simulated with no blasting.
+# Lower it once blasting replenishes stock (drilling & blasting issue).
+
+[[benches]]
+bench_id = "1-11-BNK-01"
+elevation_m = 700
+material_type = "HG"
+expected_cao_pct = 52.4
+expected_mgo_pct = 1.1
+expected_sio2_pct = 2.8
+rock_density_t_m3 = 2.6
+available_tonnage_t = 2500000
+initial_broken_stock_t = 150000
+status = "active"
+
+[[benches]]
+bench_id = "1-11-BNK-02"
+elevation_m = 690
+material_type = "HG"
+expected_cao_pct = 51.3
+expected_mgo_pct = 1.5
+expected_sio2_pct = 3.9
+rock_density_t_m3 = 2.6
+available_tonnage_t = 2200000
+initial_broken_stock_t = 150000
+status = "active"
+
+[[benches]]
+bench_id = "1-11-BNK-03"
+elevation_m = 680
+material_type = "MG"
+expected_cao_pct = 47.6
+expected_mgo_pct = 2.0
+expected_sio2_pct = 8.1
+rock_density_t_m3 = 2.55
+available_tonnage_t = 1800000
+initial_broken_stock_t = 150000
+status = "active"
+
+[[benches]]
+bench_id = "1-11-BNK-04"
+elevation_m = 715
+material_type = "WASTE"
+rock_density_t_m3 = 2.3
+available_tonnage_t = 900000
+initial_broken_stock_t = 80000
+status = "active"
+
+[[benches]]
+bench_id = "1-11-BNK-05"
+elevation_m = 670
+material_type = "MG"
+expected_cao_pct = 46.2
+expected_mgo_pct = 2.4
+expected_sio2_pct = 9.6
+rock_density_t_m3 = 2.55
+available_tonnage_t = 2000000
+initial_broken_stock_t = 0
+status = "planned"
+
+# Zones (geofences, section 3.2 /zones). FICTITIOUS site centred on 4.1615 N, -75.1840 (Tolima,
+# Colombia), chosen only so the polygons sit on real terrain in a map. The operation and all data
+# are simulated and do not represent any real company. Bench elevations follow the SRTM terrain
+# (~690 m). Polygon WKT order is "lon lat".
+
+[[zones]]
+zone_id = "1-11-BNK-01"
+zone_type = "load"
+polygon_wkt = "POLYGON((-75.186477 4.162043, -75.185126 4.162043, -75.185126 4.162766, -75.186477 4.162766, -75.186477 4.162043))"
+
+[[zones]]
+zone_id = "1-11-BNK-02"
+zone_type = "load"
+polygon_wkt = "POLYGON((-75.184676 4.162495, -75.183324 4.162495, -75.183324 4.163218, -75.184676 4.163218, -75.184676 4.162495))"
+
+[[zones]]
+zone_id = "1-11-BNK-03"
+zone_type = "load"
+polygon_wkt = "POLYGON((-75.182874 4.162043, -75.181523 4.162043, -75.181523 4.162766, -75.182874 4.162766, -75.182874 4.162043))"
+
+[[zones]]
+zone_id = "1-11-BNK-04"
+zone_type = "load"
+polygon_wkt = "POLYGON((-75.184901 4.164304, -75.183099 4.164304, -75.183099 4.165027, -75.184901 4.165027, -75.184901 4.164304))"
+
+[[zones]]
+zone_id = "1-11-BNK-05"
+zone_type = "load"
+polygon_wkt = "POLYGON((-75.184676 4.159782, -75.183324 4.159782, -75.183324 4.160505, -75.184676 4.160505, -75.184676 4.159782))"
+
+[[zones]]
+zone_id = "ZN-QUE-01"
+zone_type = "queue"
+polygon_wkt = "POLYGON((-75.184450 4.158063, -75.183550 4.158063, -75.183550 4.158606, -75.184450 4.158606, -75.184450 4.158063))"
+
+[[zones]]
+zone_id = "1-81-DMP-01"
+zone_type = "dump_waste"
+polygon_wkt = "POLYGON((-75.185351 4.171448, -75.182649 4.171448, -75.182649 4.173257, -75.185351 4.173257, -75.185351 4.171448))"
+
+[[zones]]
+zone_id = "2-11-HOP-01"
+zone_type = "dump_crusher"
+polygon_wkt = "POLYGON((-75.184270 4.143232, -75.183730 4.143232, -75.183730 4.143593, -75.184270 4.143593, -75.184270 4.143232))"
+
+[[zones]]
+zone_id = "ZN-WSH-01"
+zone_type = "workshop"
+polygon_wkt = "POLYGON((-75.181838 4.142146, -75.180758 4.142146, -75.180758 4.142870, -75.181838 4.142870, -75.181838 4.142146))"
+
+[[zones]]
+zone_id = "ZN-PRK-01"
+zone_type = "parking"
+polygon_wkt = "POLYGON((-75.186927 4.142056, -75.185576 4.142056, -75.185576 4.142960, -75.186927 4.142960, -75.186927 4.142056))"
+
