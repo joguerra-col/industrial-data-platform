@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-raw-ingest = "raw_ingest:main"
+raw-ingest = "raw_ingest.__main__:run"
 
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
